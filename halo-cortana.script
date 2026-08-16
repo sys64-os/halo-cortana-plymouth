@@ -1,0 +1,73 @@
+Window.SetBackgroundTopColor (0, 0, 0);
+Window.SetBackgroundBottomColor (0, 0, 0);
+
+bg_image = Image("background.png");
+screen_ratio = Window.GetWidth() / Window.GetHeight();
+bg_ratio = bg_image.GetWidth() / bg_image.GetHeight();
+
+if (screen_ratio > bg_ratio) {
+    bg_scale_factor = Window.GetWidth() / bg_image.GetWidth();
+} else {
+    bg_scale_factor = Window.GetHeight() / bg_image.GetHeight();
+}
+
+scaled_bg = bg_image.Scale(bg_image.GetWidth() * bg_scale_factor, bg_image.GetHeight() * bg_scale_factor);
+bg_sprite = Sprite(scaled_bg);
+bg_sprite.SetX(Window.GetWidth() / 2 - scaled_bg.GetWidth() / 2);
+bg_sprite.SetY(Window.GetHeight() / 2 - scaled_bg.GetHeight() / 2);
+bg_sprite.SetZ(-10000);
+
+frame_count = 30;
+for (i = 0; i < frame_count; i++) {
+    frames[i] = Image("heart_" + i + ".png");
+}
+
+sprite = Sprite();
+sprite.SetX(Window.GetWidth() / 2 - frames[0].GetWidth() / 2);
+sprite.SetY(Window.GetHeight() / 2 - frames[0].GetHeight() / 2);
+sprite.SetZ(10);
+
+progress = 0;
+fun refresh_callback () {
+    progress++;
+    frame = Math.Int(progress / 2) % frame_count;
+    sprite.SetImage(frames[frame]);
+}
+
+Plymouth.SetRefreshFunction (refresh_callback);
+
+# --- BUG FIX: Add Password & Message Handlers ---
+message_sprite = Sprite();
+message_sprite.SetZ(10000);
+
+fun display_message_callback (text) {
+    my_image = Image.Text(text, 0.8, 0.9, 1.0); # Light blue Cortana color
+    message_sprite.SetImage(my_image);
+    message_sprite.SetX(Window.GetWidth() / 2 - my_image.GetWidth() / 2);
+    message_sprite.SetY(Window.GetHeight() / 2 + 150);
+}
+
+prompt_sprite = Sprite();
+prompt_sprite.SetZ(10000);
+
+fun display_password_callback (prompt, bullets) {
+    bullet_string = "";
+    for (i = 0; i < bullets; i++) {
+        bullet_string += "*";
+    }
+    text = prompt + " " + bullet_string;
+    my_image = Image.Text(text, 0.8, 0.9, 1.0);
+    prompt_sprite.SetImage(my_image);
+    prompt_sprite.SetX(Window.GetWidth() / 2 - my_image.GetWidth() / 2);
+    prompt_sprite.SetY(Window.GetHeight() / 2 + 180);
+}
+
+fun display_normal_callback () {
+    prompt_sprite.SetImage(null);
+    message_sprite.SetImage(null);
+}
+
+Plymouth.SetDisplayMessageFunction (display_message_callback);
+Plymouth.SetUpdateStatusFunction (display_message_callback);
+Plymouth.SetDisplayPasswordFunction (display_password_callback);
+Plymouth.SetDisplayNormalFunction (display_normal_callback);

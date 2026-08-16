@@ -1,0 +1,8 @@
+[Plymouth Theme]
+Name=Halo Cortana
+Description=Halo Master Chief and Cortana AI Boot Theme
+ModuleName=script
+
+[script]
+ImageDir=/usr/share/plymouth/themes/halo-cortana
+ScriptFile=/usr/share/plymouth/themes/halo-cortana/halo-cortana.script
