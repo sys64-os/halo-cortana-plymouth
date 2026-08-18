@@ -36,6 +36,38 @@ fun refresh_callback () {
 
 Plymouth.SetRefreshFunction (refresh_callback);
 
+# --- PROGRESS BAR IMPLEMENTATION ---
+bar_max_width = 300;
+bar_height = 6;
+
+progress_bar_bg_sprite = Sprite();
+progress_bar_bg_sprite.SetZ(9999);
+
+progress_bar_sprite = Sprite();
+progress_bar_sprite.SetZ(10000);
+
+fun boot_progress_callback (time, progress) {
+    if (progress < 0) progress = 0;
+    if (progress > 1) progress = 1;
+    
+    current_width = Math.Int(bar_max_width * progress);
+    if (current_width < 1) current_width = 1;
+    
+    # Background bar (abu-abu gelap)
+    bg_box = Image.Box(bar_max_width, bar_height, 0.1, 0.2, 0.3);
+    progress_bar_bg_sprite.SetImage(bg_box);
+    progress_bar_bg_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
+    progress_bar_bg_sprite.SetY(Window.GetHeight() / 2 + 200);
+
+    # Foreground bar (Biru terang Cortana: r=0.2, g=0.7, b=1.0)
+    fg_box = Image.Box(current_width, bar_height, 0.2, 0.7, 1.0);
+    progress_bar_sprite.SetImage(fg_box);
+    progress_bar_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
+    progress_bar_sprite.SetY(Window.GetHeight() / 2 + 200);
+}
+
+Plymouth.SetBootProgressFunction (boot_progress_callback);
+
 # --- BUG FIX: Add Password & Message Handlers ---
 message_sprite = Sprite();
 message_sprite.SetZ(10000);
