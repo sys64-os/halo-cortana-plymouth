@@ -38,45 +38,54 @@ Plymouth.SetRefreshFunction (refresh_callback);
 
 # --- PROGRESS BAR IMPLEMENTATION ---
 bar_max_width = 300;
-bar_height = 6;
+bar_height = 4;
 
-progress_bar_bg_sprite = Sprite();
+raw_bar_bg = Image("progress_bg.png");
+raw_bar_fg = Image("progress_bar.png");
+
+scaled_bar_bg = raw_bar_bg.Scale(bar_max_width, bar_height);
+
+progress_bar_bg_sprite = Sprite(scaled_bar_bg);
+progress_bar_bg_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
+progress_bar_bg_sprite.SetY(Window.GetHeight() / 2 + 190);
 progress_bar_bg_sprite.SetZ(9999);
 
 progress_bar_sprite = Sprite();
+progress_bar_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
+progress_bar_sprite.SetY(Window.GetHeight() / 2 + 190);
 progress_bar_sprite.SetZ(10000);
 
+current_progress = 0.0;
+
 fun boot_progress_callback (time, progress) {
-    if (progress < 0) progress = 0;
-    if (progress > 1) progress = 1;
+    if (progress < 0.0) progress = 0.0;
+    if (progress > 1.0) progress = 1.0;
+    current_progress = progress;
     
-    current_width = Math.Int(bar_max_width * progress);
+    current_width = Math.Int(bar_max_width * current_progress);
     if (current_width < 1) current_width = 1;
     
-    # Background bar (abu-abu gelap)
-    bg_box = Image.Box(bar_max_width, bar_height, 0.1, 0.2, 0.3);
-    progress_bar_bg_sprite.SetImage(bg_box);
-    progress_bar_bg_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
-    progress_bar_bg_sprite.SetY(Window.GetHeight() / 2 + 200);
-
-    # Foreground bar (Biru terang Cortana: r=0.2, g=0.7, b=1.0)
-    fg_box = Image.Box(current_width, bar_height, 0.2, 0.7, 1.0);
-    progress_bar_sprite.SetImage(fg_box);
-    progress_bar_sprite.SetX(Window.GetWidth() / 2 - bar_max_width / 2);
-    progress_bar_sprite.SetY(Window.GetHeight() / 2 + 200);
+    scaled_bar_fg = raw_bar_fg.Scale(current_width, bar_height);
+    progress_bar_sprite.SetImage(scaled_bar_fg);
 }
 
 Plymouth.SetBootProgressFunction (boot_progress_callback);
 
-# --- BUG FIX: Add Password & Message Handlers ---
+# --- Password & Message Handlers ---
 message_sprite = Sprite();
 message_sprite.SetZ(10000);
 
+# Jika teks status sistem (fsck/loading) tidak ingin menutupi progress bar,
+# atau hanya ingin menampilkan pesan penting, kita posisikan teks tepat di atas progress bar
 fun display_message_callback (text) {
-    my_image = Image.Text(text, 0.8, 0.9, 1.0); # Light blue Cortana color
-    message_sprite.SetImage(my_image);
-    message_sprite.SetX(Window.GetWidth() / 2 - my_image.GetWidth() / 2);
-    message_sprite.SetY(Window.GetHeight() / 2 + 150);
+    if (text) {
+        my_image = Image.Text(text, 0.7, 0.9, 1.0); # Light blue Cortana color
+        message_sprite.SetImage(my_image);
+        message_sprite.SetX(Window.GetWidth() / 2 - my_image.GetWidth() / 2);
+        message_sprite.SetY(Window.GetHeight() / 2 + 160);
+    } else {
+        message_sprite.SetImage(null);
+    }
 }
 
 prompt_sprite = Sprite();
